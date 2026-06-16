@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import http from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
@@ -5,6 +8,7 @@ import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
 import { EngineType, MonitoredApp, TelemetryEvent } from './types';
 import { SecurityOrchestrator } from './orchestrator';
+import { GeminiService } from './services/gemini';
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -86,10 +90,18 @@ app.post('/api/shields/deploy', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Target URL and name are required.' });
   }
 
-  // Determine engine
+  // Determine engine & AI threat explanation
   let engineType: EngineType = 'trojan';
+  let aiExplanation: string | undefined = undefined;
+
   if (engineSelection === 'auto') {
-    engineType = autoClassifyUrl(targetUrl);
+    const aiResult = await GeminiService.analyzeUrl(targetUrl);
+    if (aiResult) {
+      engineType = aiResult.engineType;
+      aiExplanation = aiResult.explanation;
+    } else {
+      engineType = autoClassifyUrl(targetUrl);
+    }
   } else if (['malware', 'spyware', 'trojan'].includes(engineSelection)) {
     engineType = engineSelection as EngineType;
   } else {
@@ -132,6 +144,16 @@ app.post('/api/shields/deploy', async (req, res) => {
         level: 'info',
         message: `System activation completed. Dedicated ${engineType.toUpperCase()} security micro-engine deployed successfully.`
       });
+
+      if (aiExplanation) {
+        broadcast({
+          appId: newApp.id,
+          timestamp: Date.now(),
+          type: 'log',
+          level: 'info',
+          message: `[AI Threat Profile] ${aiExplanation}`
+        });
+      }
     }
   })
   .catch((err) => {
