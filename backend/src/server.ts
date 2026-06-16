@@ -177,14 +177,19 @@ app.post('/api/shields/:id/inject-threat', (req, res) => {
   const { specificType } = req.body;
 
   const appExists = monitoredApps.find(a => a.id === id);
+  console.log(`Threat injection request received. App ID: ${id}, Type: ${specificType}`);
+  console.log(`App exists in DB: ${!!appExists}, Engine active in orchestrator: ${SecurityOrchestrator.isInstanceActive(id)}`);
+
   if (!appExists) {
     return res.status(404).json({ success: false, message: 'Shield instance not found.' });
   }
 
   const injected = SecurityOrchestrator.injectThreat(id, specificType);
   if (injected) {
+    console.log(`Successfully injected threat into Engine Instance: ${id}`);
     return res.json({ success: true, message: 'Synthetic threat vector successfully injected.' });
   } else {
+    console.log(`Failed to inject threat. Engine is inactive for ID: ${id}`);
     return res.status(400).json({ success: false, message: 'Engine instance is currently inactive.' });
   }
 });
