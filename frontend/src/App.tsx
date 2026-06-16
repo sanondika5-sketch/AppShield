@@ -67,7 +67,7 @@ export default function App() {
   const [wsConnected, setWsConnected] = useState(false);
   const [systemTime, setSystemTime] = useState(new Date().toLocaleTimeString());
 
-  const terminalEndRef = useRef<HTMLDivElement>(null);
+  const terminalBodyRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<WebSocket | null>(null);
 
   // Update System Time clock
@@ -123,10 +123,10 @@ export default function App() {
     };
   }, []);
 
-  // Scroll to bottom of terminal whenever logs change
+  // Scroll to bottom of terminal container directly to prevent main page jumping
   useEffect(() => {
-    if (terminalEndRef.current) {
-      terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (terminalBodyRef.current) {
+      terminalBodyRef.current.scrollTop = terminalBodyRef.current.scrollHeight;
     }
   }, [logs, selectedAppId]);
 
@@ -611,7 +611,7 @@ export default function App() {
                       <span className="terminal-title">engine-shell // stdout</span>
                     </div>
 
-                    <div className="terminal-body">
+                    <div ref={terminalBodyRef} className="terminal-body">
                       {activeLogs.length === 0 ? (
                         <div style={{ color: 'var(--text-dark)', fontFamily: 'var(--font-mono)', textAlign: 'center', marginTop: '4rem' }}>
                           [WAITING] Awaiting telemetry stream startup...
@@ -624,7 +624,6 @@ export default function App() {
                           </div>
                         ))
                       )}
-                      <div ref={terminalEndRef} />
                     </div>
                   </div>
                 </div>
