@@ -421,8 +421,8 @@ export default function App() {
                   marginBottom: '1.25rem',
                   fontSize: '0.8rem',
                   display: 'flex',
-                  justify-content: 'space-between',
-                  align-items: 'center'
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
                 }}>
                   <span style={{ color: 'var(--text-muted)' }}>Auto-Assigned Shield:</span>
                   <span style={{
