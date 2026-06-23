@@ -2,6 +2,10 @@
 
 **AppShield** is a premium, real-time Security Gateway and Orchestration Dashboard designed to monitor and defend application endpoints. It dynamically provisions modular security shields tailored to specific threat models, visualizes real-time performance telemetry, and simulates threat scenarios.
 
+### 🌐 Live Demo
+You can access the live running instance of the application here:
+👉 **[https://251a23d4b521a490-27-7-5-223.serveousercontent.com](https://251a23d4b521a490-27-7-5-223.serveousercontent.com)**
+
 ---
 
 ## 🚀 Key Features
